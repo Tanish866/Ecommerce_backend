@@ -25,8 +25,11 @@ const authRoute = require('./routes/auth');
 
 //middleware
 const corsOptions = {
-	origin: 'http://localhost:5173', // Replace with your React app's origin
+	origin: [
+		'https://shop-cart-pi-eight.vercel.app/' // Replace with your React app's origin
+	],
 	credentials: true, // Enable credentials (cookies) in cross-origin requests
+	
 };
   
 app.use(cors(corsOptions));
@@ -61,14 +64,12 @@ app.get('/logout', (req, res) => {
 mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);
 mongoose
-	.connect(process.env.DATABASE_URL, { useNewUrlParser: true })
+	.connect(process.env.DATABASE_URL)
 	.then(() => {
 		app.listen(port, () => {
-			console.log('connect');
+			console.log('Server running on port', port);
 		});
 	})
 	.catch((err) => {
 		console.log(err);
 	});
-
-module.exports = app;
