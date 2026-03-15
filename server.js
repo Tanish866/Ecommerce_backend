@@ -21,7 +21,7 @@ const authRoute = require('./routes/auth');
 
 const corsOptions = {
     origin: [
-        'https://shop-cart-ts1442680-9411-tanish-singhs-projects-245eb38e.vercel.app',
+        'https://shop-cart-kohl.vercel.app',
         'http://localhost:5173'
     ],
     credentials: true,
