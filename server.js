@@ -25,12 +25,10 @@ const authRoute = require('./routes/auth');
 
 //middleware
 const corsOptions = {
-	origin: [
-		'http://localhost:5173',
-		'https://shop-cart-pi-eight.vercel.app/' // Replace with your React app's origin
-	],
-	credentials: true, // Enable credentials (cookies) in cross-origin requests
-	
+	origin: ['https://your-app.vercel.app', 'http://localhost:5173'],
+	credentials: true,
+	methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+	allowedHeaders: ['Content-Type', 'Authorization']
 };
   
 app.use(cors(corsOptions));
@@ -65,7 +63,7 @@ app.get('/logout', (req, res) => {
 mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);
 mongoose
-	.connect(process.env.DATABASE_URL)
+	.connect(import.meta.env.DATABASE_URL)
 	.then(() => {
 		app.listen(port, () => {
 			console.log('Server running on port', port);
