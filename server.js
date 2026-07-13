@@ -5,6 +5,10 @@ const path = require('path');
 const dotenv = require('dotenv');
 const dotenvExpand = require('dotenv-expand');
 const myEnv = dotenv.config();
+
+const { setServers } = require('node:dns/promises');
+setServers(["1.1.1.1", "8.8.8.8"]);
+
 dotenvExpand.expand(myEnv);
 var cookies = require('cookie-parser');
 
@@ -60,12 +64,17 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);
 
 mongoose
-    .connect(process.env.DATABASE_URL)
+    .connect(process.env.DATABASE_URL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
     .then(() => {
+        console.log('MongoDB connected successfully');
         app.listen(port, () => {
             console.log('Server running on port', port);
         });
     })
     .catch((err) => {
-        console.log(err);
+        console.error('MongoDB connection failed:', err.message);
+        process.exit(1);
     });
