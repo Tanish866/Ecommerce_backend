@@ -52,26 +52,53 @@ module.exports.addCart = (req, res) => {
 			message: 'data is undefined',
 		});
 	} else {
-		//     let cartCount = 0;
-		// Cart.find().countDocuments(function (err, count) {
-		//   cartCount = count
-		//   })
-
-		//     .then(() => {
 		const cart = {
 			id: 11,
 			userId: req.body.userId,
 			date: req.body.date,
 			products: req.body.products,
 		};
-		// cart.save()
-		//   .then(cart => res.json(cart))
-		//   .catch(err => console.log(err))
-
 		res.json(cart);
-		// })
+	}
+};
 
-		//res.json({...req.body,id:Cart.find().count()+1})
+module.exports.addProductToCart = async (req, res) => {
+	if (typeof req.body === 'undefined') {
+		return res.json({
+			status: 'error',
+			message: 'something went wrong! check your sent data',
+		});
+	}
+
+	try {
+		let cart = await Cart.findOne({ userId: req.body.userId });
+
+		if (!cart) {
+			const cartCount = await Cart.find({}).countDocuments();
+			cart = new Cart({
+				id: cartCount + 1,
+				userId: req.body.userId,
+				products: [],
+				date: new Date()
+			});
+		}
+
+		let foundProduct = false;
+		cart.products = cart.products.map(product => {
+			if (product.productId == req.body.productId) {
+				product.quantity++;
+				foundProduct = true;
+			}
+			return product;
+		});
+		if (!foundProduct) {
+			cart.products.push({ productId: req.body.productId, quantity: 1 });
+		}
+		await cart.save();
+		return res.json(cart);
+	} catch (err) {
+		console.log(err);
+		return res.status(500).json({ message: 'failed to add product to cart', error: err.message });
 	}
 };
 
@@ -113,14 +140,12 @@ module.exports.updateProductToCart = async (req, res) => {
 		});
 	} else {
 		let cart = await Cart.findOne({userId: req.body.userId});
-		console.log(cart);
 		if(!cart) {
 			return res.status(404).json({
 				data: {},
 				message: 'no cart found for the user'
 			})
 		}
-		console.log(cart);
 
 		let foundProduct = false;
 		cart.products = cart.products.map(product => {
