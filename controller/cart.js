@@ -76,38 +76,32 @@ module.exports.addCart = (req, res) => {
 };
 
 module.exports.editCart = async (req, res) => {
-	if (typeof req.body == undefined ) {
-		res.json({
+	if (typeof req.body === 'undefined') {
+		return res.json({
 			status: 'error',
 			message: 'something went wrong! check your sent data',
 		});
-	} else {
-		let cart = await Cart.findOne({userId: req.body.userId});
-		console.log(cart);
-		if(!cart) {
-			const cartCount = await Cart.find({}).countDocuments();
-			cart = new Cart({
-				id: cartCount+1,
-				userId: req.body.userId,
-				products: [],
-				date: new Date()
+	}
+
+	try {
+		const cart = await Cart.findOne({ id: req.params.id });
+
+		if (!cart) {
+			return res.status(404).json({
+				data: {},
+				message: 'no cart found with this id'
 			});
 		}
-		console.log(cart);
 
-		let foundProduct = false;
-		cart.products = cart.products.map(product => {
-			if(product.productId == req.body.productId) {
-				product.quantity++;
-				foundProduct = true;
-			}
-			return product;
-		});
-		if(!foundProduct) {
-			cart.products.push({productId: req.body.productId, quantity: 1});
-		}
+		if (req.body.userId !== undefined) cart.userId = req.body.userId;
+		if (req.body.date !== undefined) cart.date = req.body.date;
+		if (req.body.products !== undefined) cart.products = req.body.products;
+
 		await cart.save();
 		return res.json(cart);
+	} catch (err) {
+		console.log(err);
+		return res.status(500).json({ message: 'failed to update cart', error: err.message });
 	}
 };
 

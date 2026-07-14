@@ -10,6 +10,7 @@ router.post('/',cart.addCart)
 //router.post('/:id',cart.addtoCart)
 
 router.put('/',cart.editCart);
+router.put('/:id',cart.editCart);
 router.put('/updateProduct', cart.updateProductToCart);
 router.patch('/:id',cart.editCart)
 router.delete('/:id',cart.deleteCart)
